@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品详情 - HarmoniWindow 声景幻窗</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置自定义颜色（莫兰迪色系） -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            green: '#7A8B84',  // 鼠尾草绿：主色调，治愈
+                            cream: '#F0EFE9',  // 暖白：背景色
+                            sand: '#D8C3A5',   // 暖沙色：强调色/按钮
+                            dark: '#3E403F',   // 深岩灰：文字
+                            slate: '#5A6C7C',  // 莫兰迪蓝灰：辅助色
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 添加一些平滑滚动的效果 */
+        html { scroll-behavior: smooth; }
+        
+        /* 确保所有交互元素都有平滑过渡 */
+        a, button, .bento-card, .timeline-item, [class*="hover:"] {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 简单的淡入动画 */
+        .fade-in-up {
+            animation: fadeInUp 1.2s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 视频背景样式 */
+        video {
+            filter: brightness(0.85) contrast(1.1);
+        }
+        /* 窗框效果增强 */
+        .window-frame {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(to bottom, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to top, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to right, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to left, rgba(101, 67, 33, 0.5) 0%, transparent 8%);
+            border: 12px solid rgba(139, 90, 43, 0.4);
+            box-shadow: 
+                inset 0 0 60px rgba(101, 67, 33, 0.3),
+                0 0 40px rgba(0, 0, 0, 0.2);
+        }
+        /* 按钮悬停效果增强 */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        /* Bento Grid 样式优化 */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(3, 1fr);
+                grid-auto-rows: minmax(200px, auto);
+            }
+        }
+        /* Bento 卡片动画 */
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        /* 确保所有卡片悬停效果平滑 */
+        .bg-morandi-cream {
+            transition: all 0.3s ease;
+        }
+        .bg-morandi-cream:hover {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-morandi-cream text-morandi-dark font-sans antialiased">
+
+    <!-- 导航栏 -->
+    <nav class="bg-white/80 backdrop-blur-sm border-b border-morandi-cream/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="harmoni_landing_副本.html" class="text-2xl font-bold text-morandi-dark hover:text-morandi-green transition-colors">
+                HarmoniWindow
+            </a>
+            <a href="harmoni_landing_副本.html" class="px-6 py-2 bg-morandi-sand hover:bg-morandi-green text-morandi-dark rounded-full font-medium transition-all duration-300 hover:scale-105">
+                返回首页
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="max-w-6xl mx-auto px-4 py-16">
+        
+        <!-- 页面标题 -->
+        <div class="text-center mb-16 fade-in-up">
+            <h1 class="text-4xl md:text-5xl font-bold text-morandi-dark mb-4">产品详情</h1>
+            <p class="text-lg text-morandi-slate">探索 HarmoniWindow 的核心技术</p>
+        </div>
+
+        <!-- 功能 1: 真 4K 视窗 -->
+        <section id="visual" class="mb-24 fade-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- 左侧：图片 -->
+                <div class="order-2 md:order-1">
+                    <div class="relative rounded-2xl overflow-hidden shadow-xl">
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                             alt="真 4K 视窗展示" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-semibold text-morandi-dark">
+                            4K 超清
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：文字内容 -->
+                <div class="order-1 md:order-2 space-y-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-morandi-green/20 rounded-xl flex items-center justify-center text-2xl">
+                            🖼️
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark">真 4K 视窗</h2>
+                    </div>
+                    
+                    <p class="text-lg text-morandi-slate leading-relaxed">
+                        超清细腻的风景视窗，仿佛置身其中的视觉延伸。每一帧画面都经过精心调色，还原自然最真实的色彩。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-morandi-cream/50">
+                            <h3 class="font-semibold text-morandi-dark mb-2">技术规格</h3>
+                            <ul class="space-y-2 text-morandi-slate">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>RK3588 主控板 - 强大的处理性能</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>15 寸显示屏 - 完美适配家居空间</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>4K 分辨率 - 3840 × 2160 像素</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能 2: 空间声场 -->
+        <section id="audio" class="mb-24 fade-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- 左侧：文字内容 -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-morandi-slate/20 rounded-xl flex items-center justify-center text-2xl">
+                            🔊
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark">空间声场</h2>
+                    </div>
+                    
+                    <p class="text-lg text-morandi-slate leading-relaxed">
+                        内置白噪音（雨声、鸟鸣）与画面同步的空间音频，360° 沉浸式环绕体验。声音与视觉完美融合，营造真实的自然氛围。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-morandi-cream/50">
+                            <h3 class="font-semibold text-morandi-dark mb-2">核心特性</h3>
+                            <ul class="space-y-2 text-morandi-slate">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>360° 空间音频技术</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>画面与声音完美同步</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>多种自然白噪音场景（雨声、鸟鸣、海浪等）</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>可调节音量与场景切换</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：图片 -->
+                <div>
+                    <div class="relative rounded-2xl overflow-hidden shadow-xl">
+                        <img src="https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                             alt="空间声场展示" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-semibold text-morandi-dark">
+                            360° 环绕
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能 3: 拟真光谱 -->
+        <section id="light" class="mb-24 fade-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- 左侧：对比图片 -->
+                <div class="order-2 md:order-1">
+                    <div class="relative rounded-2xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- 早晨冷光 -->
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                                     alt="早晨冷光" 
+                                     class="w-full h-full object-cover aspect-square">
+                                <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-semibold text-morandi-dark">
+                                    晨光冷色
+                                </div>
+                            </div>
+                            <!-- 傍晚暖光 -->
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                                     alt="傍晚暖光" 
+                                     class="w-full h-full object-cover aspect-square">
+                                <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-semibold text-morandi-dark">
+                                    暮光暖色
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：文字内容 -->
+                <div class="order-1 md:order-2 space-y-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-morandi-sand/30 rounded-xl flex items-center justify-center text-2xl">
+                            💡
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark">拟真光谱</h2>
+                    </div>
+                    
+                    <p class="text-lg text-morandi-slate leading-relaxed">
+                        亲自然光照技术，模拟自然日光变化（昼夜节律），全光谱护眼，保护视力健康。从清晨的冷白光到傍晚的暖黄光，跟随自然节奏调节。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-morandi-cream/50">
+                            <h3 class="font-semibold text-morandi-dark mb-2">核心特性</h3>
+                            <ul class="space-y-2 text-morandi-slate">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-sand rounded-full"></span>
+                                    <span>模拟自然日光变化（昼夜节律）</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-sand rounded-full"></span>
+                                    <span>全光谱护眼技术</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-sand rounded-full"></span>
+                                    <span>自动调节色温（早晨冷光 → 傍晚暖光）</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-sand rounded-full"></span>
+                                    <span>减少蓝光，保护视力</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能 4: AIGC 独家生成 -->
+        <section id="ai" class="mb-24 fade-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- 左侧：文字内容 -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-morandi-green/20 rounded-xl flex items-center justify-center text-2xl">
+                            ✨
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark">AIGC 独家生成</h2>
+                    </div>
+                    
+                    <p class="text-lg text-morandi-slate leading-relaxed">
+                        输入提示词，生成专属窗景。无限可能，超越静态视频。与竞争对手（Atmoph）不同，我们支持"文本到场景"生成，让每一扇窗都独一无二。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-morandi-cream/50">
+                            <h3 class="font-semibold text-morandi-dark mb-2">核心特性</h3>
+                            <ul class="space-y-2 text-morandi-slate">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>文本到场景生成（Text-to-Scene）</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>AI 智能理解自然语言描述</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>无限场景可能，告别静态视频</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-green rounded-full"></span>
+                                    <span>独家功能，行业领先</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：UI 界面展示 -->
+                <div>
+                    <div class="relative rounded-2xl overflow-hidden shadow-xl bg-white/80 backdrop-blur-sm p-8 border border-morandi-cream/50">
+                        <!-- 模拟输入框界面 -->
+                        <div class="space-y-4">
+                            <div class="text-sm text-morandi-slate mb-4">输入你的想法...</div>
+                            <div class="bg-morandi-cream/50 rounded-lg p-4 border border-morandi-cream/30">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-morandi-green">💭</span>
+                                    <span class="text-sm font-medium text-morandi-dark">提示词输入</span>
+                                </div>
+                                <div class="bg-white rounded px-3 py-2 text-sm text-morandi-slate border border-morandi-cream/30">
+                                    "雨后的森林，阳光透过树叶..."
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center py-4">
+                                <div class="w-12 h-12 bg-morandi-green/20 rounded-full flex items-center justify-center animate-pulse">
+                                    <span class="text-2xl">✨</span>
+                                </div>
+                            </div>
+                            <div class="bg-morandi-green/10 rounded-lg p-4 border border-morandi-green/20">
+                                <div class="text-xs text-morandi-green mb-2 font-medium">正在生成中...</div>
+                                <div class="h-32 bg-gradient-to-br from-morandi-green/20 to-morandi-slate/20 rounded flex items-center justify-center">
+                                    <span class="text-morandi-slate text-sm">生成的场景预览</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能 5: 木质美学 -->
+        <section id="design" class="mb-24 fade-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- 左侧：框架颜色展示 -->
+                <div class="order-2 md:order-1">
+                    <div class="relative rounded-2xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-3 gap-3">
+                            <!-- 胡桃木 -->
+                            <div class="relative aspect-square">
+                                <div class="w-full h-full bg-gradient-to-br from-amber-900 to-amber-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-white text-xs font-medium">胡桃木</span>
+                                </div>
+                            </div>
+                            <!-- 橡木 -->
+                            <div class="relative aspect-square">
+                                <div class="w-full h-full bg-gradient-to-br from-amber-200 to-amber-100 rounded-lg flex items-center justify-center border border-amber-300">
+                                    <span class="text-amber-900 text-xs font-medium">橡木</span>
+                                </div>
+                            </div>
+                            <!-- 金属 -->
+                            <div class="relative aspect-square">
+                                <div class="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 rounded-lg flex items-center justify-center">
+                                    <span class="text-white text-xs font-medium">金属</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-semibold text-morandi-dark">
+                            磁性框架
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：文字内容 -->
+                <div class="order-1 md:order-2 space-y-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-morandi-slate/20 rounded-xl flex items-center justify-center text-2xl">
+                            🪵
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark">木质美学</h2>
+                    </div>
+                    
+                    <p class="text-lg text-morandi-slate leading-relaxed">
+                        磁性木质框架（胡桃木、橡木、金属），完美匹配家居装饰风格，融入生活空间。简约而不简单，每一处细节都体现亲自然设计理念。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-morandi-cream/50">
+                            <h3 class="font-semibold text-morandi-dark mb-2">可选材质</h3>
+                            <ul class="space-y-2 text-morandi-slate">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>胡桃木（Walnut）- 深沉优雅</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>橡木（Oak）- 自然温暖</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>金属（Metal）- 现代简约</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-morandi-slate rounded-full"></span>
+                                    <span>磁性连接，易于安装与更换</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部 CTA -->
+        <section class="text-center py-16 fade-in-up">
+            <div class="bg-gradient-to-br from-morandi-green/10 to-morandi-slate/10 rounded-3xl p-12 md:p-16 border border-morandi-cream/50">
+                <h2 class="text-3xl md:text-4xl font-bold text-morandi-dark mb-4">准备好开启感官治愈之旅了吗？</h2>
+                <p class="text-lg text-morandi-slate mb-8 max-w-2xl mx-auto">
+                    在 15 寸的空间里，重构你的感官体验。立即预订，让 HarmoniWindow 成为你生活的一部分。
+                </p>
+                <a href="order.html" class="cta-button inline-block bg-morandi-green hover:bg-morandi-slate text-white font-semibold text-lg py-5 px-12 rounded-full transition duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105">
+                    立即预订
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" onclick="scrollToTop()" aria-label="返回顶部">
+        ↑
+    </button>
+
+    <!-- Footer -->
+    <footer class="bg-morandi-dark text-morandi-cream py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- 品牌信息 -->
+            <div class="text-center mb-12">
+                <h3 class="text-2xl font-bold mb-3 text-morandi-cream">HarmoniWindow</h3>
+                <p class="text-sm text-morandi-cream/70 italic">声景幻窗</p>
+            </div>
+
+            <!-- 信息网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center md:text-left">
+                <!-- 支持信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">支持</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Incubated by XBOTPARK (Ningbo) &<br>
+                        Ningbo Institute of Intelligent Technology.
+                    </p>
+                </div>
+
+                <!-- 供应链信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">供应链</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Powered by Shared Factory &<br>
+                        Genesis Link Tech.
+                    </p>
+                </div>
+
+                <!-- 品牌使命 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">使命</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed italic">
+                        用声景打造新的生活方式，<br>
+                        让感官的自由成为生活的常态
+                    </p>
+                </div>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="border-t border-morandi-cream/20 mb-8"></div>
+
+            <!-- 版权信息 -->
+            <div class="text-center">
+                <p class="text-xs text-morandi-cream/50">© 2025 HarmoniWindow Team.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 返回顶部按钮
+        const backToTopButton = document.getElementById('backToTop');
+        
+        function toggleBackToTop() {
+            if (window.scrollY > 500) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        window.addEventListener('scroll', toggleBackToTop);
+        toggleBackToTop(); // 初始检查
+    </script>
+
+</body>
+</html>

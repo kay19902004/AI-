@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立即预订 - HarmoniWindow 声景幻窗</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置自定义颜色（莫兰迪色系） -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            green: '#7A8B84',  // 鼠尾草绿：主色调，治愈
+                            cream: '#F0EFE9',  // 暖白：背景色
+                            sand: '#D8C3A5',   // 暖沙色：强调色/按钮
+                            dark: '#3E403F',   // 深岩灰：文字
+                            slate: '#5A6C7C',  // 莫兰迪蓝灰：辅助色
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 添加一些平滑滚动的效果 */
+        html { scroll-behavior: smooth; }
+        
+        /* 确保所有交互元素都有平滑过渡 */
+        a, button, .bento-card, .timeline-item, [class*="hover:"] {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 简单的淡入动画 */
+        .fade-in-up {
+            animation: fadeInUp 1.2s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-morandi-cream text-morandi-dark font-sans antialiased">
+
+    <!-- 导航栏 -->
+    <nav class="bg-white/80 backdrop-blur-sm border-b border-morandi-cream/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="harmoni_landing_副本.html" class="text-2xl font-bold text-morandi-dark hover:text-morandi-green transition-colors">
+                HarmoniWindow
+            </a>
+            <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+                <a href="harmoni_landing_副本.html" class="text-xs sm:text-sm md:text-base text-morandi-dark hover:text-morandi-green transition-colors font-medium whitespace-nowrap">
+                    首页
+                </a>
+                <a href="product.html" class="text-xs sm:text-sm md:text-base text-morandi-dark hover:text-morandi-green transition-colors font-medium whitespace-nowrap">
+                    产品详情
+                </a>
+                <a href="order.html" class="text-xs sm:text-sm md:text-base text-morandi-green font-medium whitespace-nowrap border-b-2 border-morandi-green">
+                    立即预订
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容：分屏布局 -->
+    <main class="min-h-screen flex flex-col md:flex-row">
+        <!-- 左侧：产品展示 -->
+        <div class="w-full md:w-1/2 bg-gradient-to-br from-morandi-green/10 to-morandi-slate/10 flex items-center justify-center p-8 md:p-16">
+            <div class="max-w-md text-center md:text-left fade-in-up">
+                <div class="mb-8">
+                    <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="HarmoniWindow 产品展示" 
+                         class="w-full rounded-2xl shadow-2xl transform hover:scale-105 transition duration-700">
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-morandi-dark mb-4">
+                    Bring Nature Home.
+                </h1>
+                <p class="text-xl md:text-2xl text-morandi-slate font-light mb-6">
+                    Early Bird Offer
+                </p>
+                <p class="text-morandi-slate leading-relaxed">
+                    在 15 寸的空间里，重构你的感官体验。加入等待名单，享受早鸟优惠。
+                </p>
+            </div>
+        </div>
+
+        <!-- 右侧：预订表单 -->
+        <div class="w-full md:w-1/2 bg-white flex items-center justify-center p-8 md:p-16">
+            <div class="w-full max-w-md fade-in-up">
+                <h2 class="text-2xl md:text-3xl font-bold text-morandi-dark mb-2">加入等待名单</h2>
+                <p class="text-morandi-slate mb-8">我们将在产品发售时第一时间通知您</p>
+
+                <form id="orderForm" class="space-y-6">
+                    <!-- 姓名 -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-morandi-dark mb-2">
+                            姓名 <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all"
+                            placeholder="请输入您的姓名">
+                    </div>
+
+                    <!-- 邮箱 -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-morandi-dark mb-2">
+                            邮箱 <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all"
+                            placeholder="your.email@example.com">
+                    </div>
+
+                    <!-- 框架选择 -->
+                    <div>
+                        <label for="frame" class="block text-sm font-medium text-morandi-dark mb-2">
+                            框架选择 <span class="text-red-500">*</span>
+                        </label>
+                        <select 
+                            id="frame" 
+                            name="frame" 
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all appearance-none cursor-pointer">
+                            <option value="">请选择框架材质</option>
+                            <option value="walnut">胡桃木 (Walnut)</option>
+                            <option value="oak">橡木 (Oak)</option>
+                            <option value="metal-black">金属黑 (Metal Black)</option>
+                        </select>
+                    </div>
+
+                    <!-- 消息（可选） -->
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-morandi-dark mb-2">
+                            留言（可选）
+                        </label>
+                        <textarea 
+                            id="message" 
+                            name="message" 
+                            rows="4"
+                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all resize-none"
+                            placeholder="有什么想对我们说的吗？"></textarea>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <button 
+                        type="submit"
+                        class="w-full bg-morandi-sand hover:bg-morandi-green text-morandi-dark font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105">
+                        加入等待名单
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 成功提示模态框 -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="mb-4">
+                <div class="w-16 h-16 bg-morandi-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">✓</span>
+                </div>
+                <h3 class="text-xl font-bold text-morandi-dark mb-2">感谢预订！</h3>
+                <p class="text-morandi-slate">
+                    我们将在产品发售时第一时间通知您。
+                </p>
+            </div>
+            <button 
+                onclick="closeModal()"
+                class="mt-6 px-6 py-2 bg-morandi-green hover:bg-morandi-slate text-white rounded-full font-medium transition-all duration-300">
+                确定
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-morandi-dark text-morandi-cream py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- 品牌信息 -->
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold mb-3 text-morandi-cream">HarmoniWindow</h3>
+                <p class="text-sm text-morandi-cream/70 italic">声景幻窗</p>
+            </div>
+
+            <!-- 信息网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
+                <!-- 支持信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">支持</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Incubated by XBOTPARK (Ningbo) &<br>
+                        Ningbo Institute of Intelligent Technology.
+                    </p>
+                </div>
+
+                <!-- 供应链信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">供应链</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Powered by Shared Factory &<br>
+                        Genesis Link Tech.
+                    </p>
+                </div>
+
+                <!-- 品牌使命 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">使命</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed italic">
+                        用声景打造新的生活方式，<br>
+                        让感官的自由成为生活的常态
+                    </p>
+                </div>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="border-t border-morandi-cream/20 mb-6"></div>
+
+            <!-- 版权信息 -->
+            <div class="text-center">
+                <p class="text-xs text-morandi-cream/50">© 2025 HarmoniWindow Team.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 表单提交处理
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                frame: document.getElementById('frame').value,
+                message: document.getElementById('message').value
+            };
+            
+            // 这里可以添加实际的表单提交逻辑（例如发送到服务器）
+            console.log('Form submitted:', formData);
+            
+            // 显示成功模态框
+            document.getElementById('successModal').classList.add('active');
+            
+            // 重置表单
+            this.reset();
+        });
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESC 键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

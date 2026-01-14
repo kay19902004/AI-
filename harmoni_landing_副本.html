@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarmoniWindow 声景幻窗 - 用声景打造新的生活方式</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置自定义颜色（莫兰迪色系） -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            green: '#7A8B84',  // 鼠尾草绿：主色调，治愈
+                            cream: '#F0EFE9',  // 暖白：背景色
+                            sand: '#D8C3A5',   // 暖沙色：强调色/按钮
+                            dark: '#3E403F',   // 深岩灰：文字
+                            slate: '#5A6C7C',  // 莫兰迪蓝灰：辅助色
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 添加一些平滑滚动的效果 */
+        html { scroll-behavior: smooth; }
+        
+        /* 确保所有交互元素都有平滑过渡 */
+        a, button, .bento-card, .timeline-item, [class*="hover:"] {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 简单的淡入动画 */
+        .fade-in-up {
+            animation: fadeInUp 1.2s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 视频背景样式 */
+        video {
+            filter: brightness(0.85) contrast(1.1);
+        }
+        /* 窗框效果增强 */
+        .window-frame {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(to bottom, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to top, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to right, rgba(101, 67, 33, 0.5) 0%, transparent 8%),
+                linear-gradient(to left, rgba(101, 67, 33, 0.5) 0%, transparent 8%);
+            border: 12px solid rgba(139, 90, 43, 0.4);
+            box-shadow: 
+                inset 0 0 60px rgba(101, 67, 33, 0.3),
+                0 0 40px rgba(0, 0, 0, 0.2);
+        }
+        /* 按钮悬停效果增强 */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        /* Bento Grid 样式优化 */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(3, 1fr);
+                grid-auto-rows: minmax(200px, auto);
+            }
+        }
+        /* Bento 卡片动画 */
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        /* 确保所有卡片悬停效果平滑 */
+        .bg-morandi-cream {
+            transition: all 0.3s ease;
+        }
+        .bg-morandi-cream:hover {
+            transition: all 0.3s ease;
+        }
+        /* 用户旅程时间线样式 */
+        #user-journey {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+        }
+        #user-journey.morning-bg {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+        }
+        #user-journey.focus-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        #user-journey.relax-bg {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        }
+        #user-journey.sleep-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+        #user-journey.sleep-bg h2,
+        #user-journey.sleep-bg > div > div > p {
+            color: white;
+        }
+        #user-journey.sleep-bg .timeline-item .bg-white\/90 {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .timeline-item {
+            opacity: 0.6;
+            transition: opacity 0.5s ease, transform 0.3s ease;
+        }
+        .timeline-item.active {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+        @media (max-width: 768px) {
+            #timeline-line {
+                display: none;
+            }
+            .timeline-item {
+                padding-left: 0;
+            }
+        }
+        /* 导航栏样式 */
+        #navbar {
+            background: transparent;
+        }
+        #navbar.scrolled {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        /* 移动端导航栏优化 */
+        @media (max-width: 640px) {
+            #navbar {
+                padding: 0.75rem 1rem;
+            }
+            #navbar .text-xl {
+                font-size: 1.125rem;
+            }
+        }
+        /* 背景音频播放器样式 */
+        #audioPlayerBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: rgba(216, 195, 165, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(216, 195, 165, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        #audioPlayerBtn:hover {
+            background: rgba(216, 195, 165, 1);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        #audioPlayerBtn.playing {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 0 rgba(122, 139, 132, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 8px rgba(122, 139, 132, 0);
+            }
+        }
+        #audioPlayerBtn svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: #3E403F;
+            transition: all 0.3s ease;
+        }
+        #audioPlayerBtn.playing svg {
+            fill: #7A8B84;
+        }
+    </style>
+</head>
+<body class="bg-morandi-cream text-morandi-dark font-sans antialiased">
+
+    <!-- 顶部导航栏 -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <!-- 左侧：品牌名 -->
+            <a href="harmoni_landing_副本.html" class="text-xl md:text-2xl font-bold text-morandi-dark hover:text-morandi-green transition-colors">
+                HarmoniWindow
+            </a>
+            
+            <!-- 右侧：导航链接 -->
+            <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+                <a href="harmoni_landing_副本.html" class="text-xs sm:text-sm md:text-base text-morandi-dark hover:text-morandi-green transition-colors font-medium whitespace-nowrap">
+                    首页
+                </a>
+                <a href="product.html" class="text-xs sm:text-sm md:text-base text-morandi-dark hover:text-morandi-green transition-colors font-medium whitespace-nowrap">
+                    产品详情
+                </a>
+                <a href="order.html" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-morandi-green hover:bg-morandi-slate text-white rounded-full text-xs sm:text-sm md:text-base font-medium transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg whitespace-nowrap">
+                    立即预订
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section (首屏) -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <!-- 视频背景：循环播放的森林/雨景 -->
+        <div class="absolute inset-0 z-0">
+            <video 
+                autoplay 
+                muted 
+                loop 
+                playsinline
+                class="w-full h-full object-cover"
+                poster="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80">
+                <source src="https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4" type="video/mp4">
+                <!-- 备用图片，如果视频无法加载 -->
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+                     alt="Nature Window View" 
+                     class="w-full h-full object-cover">
+            </video>
+            <!-- 遮罩层，让文字更清晰 -->
+            <div class="absolute inset-0 bg-morandi-dark/40"></div>
+        </div>
+
+        <!-- 木制窗框装饰效果 -->
+        <div class="window-frame"></div>
+
+        <!-- 内容区域 -->
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto fade-in-up">
+            <h1 class="text-6xl md:text-8xl font-bold text-white mb-4 tracking-tight drop-shadow-2xl">
+                HarmoniWindow
+                <span class="block text-4xl md:text-5xl mt-3 font-light">声景幻窗</span>
+            </h1>
+            <p class="text-2xl md:text-3xl text-morandi-cream mb-6 font-light opacity-95 drop-shadow-lg">
+                让全球 Z 世代的家庭更具氛围感
+            </p>
+            <p class="text-lg md:text-xl text-white/90 mb-12 font-light leading-relaxed max-w-3xl mx-auto drop-shadow-md">
+                不仅仅是窗户。它是 4K 视窗、沉浸式声场与拟真自然光的完美协同。<br class="hidden md:block">
+                在 15 寸的空间里，重构你的感官体验。
+            </p>
+            <a href="product.html" target="_blank" class="cta-button inline-block bg-morandi-sand hover:bg-white text-morandi-dark font-semibold text-lg py-5 px-12 rounded-full transition duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 relative z-10">
+                开启感官治愈
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. 城市居住的隐形困境 (The Problem) -->
+    <section class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-morandi-green mb-4">城市居住的隐形困境</h2>
+                <p class="text-gray-500">基于用户研究与 GAP 分析</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 卡片 1: 空间压抑 -->
+                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
+                        <!-- 封闭房间/盒子图标 - 无窗无门 -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-morandi-dark">空间压抑</h3>
+                    <p class="text-gray-600 leading-relaxed">一二线城市的小户型租房，缺乏通透感，四面墙壁带来心理窒息。</p>
+                </div>
+
+                <!-- 卡片 2: 感官匮乏 -->
+                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
+                        <!-- 带斜线的静态相框图标 -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="12" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4l16 16" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-morandi-dark">感官匮乏</h3>
+                    <p class="text-gray-600 leading-relaxed">现有装饰（壁画/摆件）功能单一，缺乏自然光照与声音的动态陪伴，容易审美疲劳。</p>
+                </div>
+
+                <!-- 卡片 3: 情绪孤独 -->
+                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
+                        <!-- 孤独人物图标 - 单人 -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="7" r="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-morandi-dark">情绪孤独</h3>
+                    <p class="text-gray-600 leading-relaxed">下班后的 20-24 点，独自面对空荡的房间，缺乏治愈与陪伴。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 品牌使命展示 -->
+    <section class="py-16 px-4 bg-morandi-cream">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="text-2xl md:text-3xl font-light text-morandi-dark leading-relaxed italic">
+                "用声景打造新的生活方式，<br class="md:hidden">
+                让感官的自由成为生活的常态"
+            </p>
+            <p class="mt-6 text-sm text-morandi-slate">—— HarmoniWindow 品牌使命</p>
+        </div>
+    </section>
+
+    <!-- 4. 技术解决方案 (Tech & Solutions) - Bento Grid -->
+    <section id="features" class="py-20 px-4 bg-gradient-to-b from-morandi-green to-morandi-slate text-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">技术解决方案</h2>
+                <p class="text-morandi-cream opacity-80">五大核心模块，重构感官体验</p>
+            </div>
+
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
+                <!-- 卡片 1: 视 (Visual) - 大卡片 -->
+                <a href="product.html#visual" class="md:col-span-2 bento-card bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 block w-full h-full no-underline group">
+                    <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
+                            🖼️
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">视</h3>
+                            <p class="text-xl font-semibold text-morandi-cream mb-3">真 4K 视窗</p>
+                        </div>
+                    </div>
+                    <p class="text-white/90 leading-relaxed mb-4">
+                        超清细腻的风景视窗，仿佛置身其中的视觉延伸。
+                    </p>
+                    <div class="mt-6 pt-6 border-t border-white/20">
+                        <p class="text-sm text-white/70 mb-2">技术规格</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">RK3588 主控板</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">15 寸显示屏</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 卡片 2: 听 (Audio) - 中等卡片 -->
+                <a href="product.html#audio" class="bento-card bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 block w-full h-full no-underline group">
+                    <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
+                            🔊
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">听</h3>
+                            <p class="text-xl font-semibold text-morandi-cream mb-3">空间声场</p>
+                        </div>
+                    </div>
+                    <p class="text-white/90 leading-relaxed mb-4">
+                        内置白噪音（雨声、鸟鸣）与画面同步的空间音频，360° 沉浸式环绕体验。
+                    </p>
+                </a>
+
+                <!-- 卡片 3: 光 (Light) - 中等卡片 -->
+                <a href="product.html#light" class="bento-card bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 block w-full h-full no-underline group">
+                    <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
+                            💡
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">光</h3>
+                            <p class="text-xl font-semibold text-morandi-cream mb-3">拟真光谱</p>
+                        </div>
+                    </div>
+                    <p class="text-white/90 leading-relaxed mb-4">
+                        亲自然光照技术，模拟自然日光变化（昼夜节律），全光谱护眼，保护视力健康。
+                    </p>
+                </a>
+
+                <!-- 卡片 4: 智 (AI) - 大卡片，突出差异化 -->
+                <a href="product.html#ai" class="md:col-span-2 bento-card bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/30 hover:bg-white/20 relative overflow-hidden block w-full h-full no-underline group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
+                            <div class="w-12 h-12 bg-white/25 rounded-xl flex items-center justify-center text-2xl">
+                                ✨
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold mb-2">智</h3>
+                                <p class="text-xl font-semibold text-morandi-cream mb-3">AIGC 独家生成</p>
+                            </div>
+                        </div>
+                        <p class="text-white/90 leading-relaxed mb-4">
+                            与竞争对手（Atmoph）不同，我们支持"文本到场景"生成。用户输入提示词，AI 即可生成独一无二的窗景。
+                        </p>
+                        <div class="mt-6 pt-6 border-t border-white/20">
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-morandi-cream">独家功能</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 卡片 5: 形 (Design) - 小卡片 -->
+                <a href="product.html#design" class="bento-card bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 block w-full h-full no-underline group">
+                    <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
+                            🪵
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">形</h3>
+                            <p class="text-xl font-semibold text-morandi-cream mb-3">木质美学</p>
+                        </div>
+                    </div>
+                    <p class="text-white/90 leading-relaxed">
+                        磁性木质框架（木纹/金属），完美匹配家居装饰风格，融入生活空间。
+                    </p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 用户旅程时间线 (User Journey Timeline) -->
+    <section id="user-journey" class="py-20 px-4 relative overflow-hidden transition-colors duration-1000">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-morandi-dark">陪伴你的一天：从清晨到深夜</h2>
+                <p class="text-gray-600">基于用户旅程地图</p>
+            </div>
+
+            <!-- 时间线容器 -->
+            <div class="relative">
+                <!-- 时间线连接线 -->
+                <div class="hidden md:block absolute left-8 md:left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-morandi-slate/40 via-morandi-green/30 via-morandi-sand/30 to-morandi-dark/50 transition-all duration-1000 opacity-40" id="timeline-line"></div>
+
+                <!-- 时间点 -->
+                <div class="space-y-16 md:space-y-24">
+                    <!-- 07:00 - 清晨唤醒 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-start gap-6 active" data-time="07:00" data-bg="morning">
+                        <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-morandi-slate/20 rounded-full flex items-center justify-center shadow-lg z-10 border-4 border-white relative md:left-0 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0">
+                            <span class="text-2xl">🌅</span>
+                        </div>
+                        <div class="flex-1 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl font-bold text-morandi-slate">07:00</span>
+                                <span class="text-lg text-gray-500">清晨唤醒</span>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500 mb-2">场景</p>
+                                <p class="text-morandi-dark font-medium">晨光洒入，鸟鸣声声</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-2">益处</p>
+                                <p class="text-gray-700 leading-relaxed">模拟自然光唤醒，调整生理节律。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 15:00 - 专注工作 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-start gap-6" data-time="15:00" data-bg="focus">
+                        <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-morandi-green/20 rounded-full flex items-center justify-center shadow-lg z-10 border-4 border-white relative md:left-0 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0">
+                            <span class="text-2xl">🌲</span>
+                        </div>
+                        <div class="flex-1 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl font-bold text-morandi-green">15:00</span>
+                                <span class="text-lg text-gray-500">专注工作</span>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500 mb-2">场景</p>
+                                <p class="text-morandi-dark font-medium">森林图书馆，白噪音环绕</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-2">益处</p>
+                                <p class="text-gray-700 leading-relaxed">场景白噪音与护眼灯光协同，提升专注力。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 19:00 - 晚餐放松 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-start gap-6" data-time="19:00" data-bg="relax">
+                        <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-morandi-sand/30 rounded-full flex items-center justify-center shadow-lg z-10 border-4 border-white relative md:left-0 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0">
+                            <span class="text-2xl">🌆</span>
+                        </div>
+                        <div class="flex-1 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl font-bold text-morandi-sand">19:00</span>
+                                <span class="text-lg text-gray-500">晚餐放松</span>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500 mb-2">场景</p>
+                                <p class="text-morandi-dark font-medium">夕阳西下，温馨咖啡馆</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-2">益处</p>
+                                <p class="text-gray-700 leading-relaxed">缓解工作疲惫，营造温馨的独处或聚餐氛围。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 23:30 - 深夜助眠 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-start gap-6" data-time="23:30" data-bg="sleep">
+                        <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-morandi-dark/30 rounded-full flex items-center justify-center shadow-lg z-10 border-4 border-white relative md:left-0 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0">
+                            <span class="text-2xl">🌙</span>
+                        </div>
+                        <div class="flex-1 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl font-bold text-morandi-dark">23:30</span>
+                                <span class="text-lg text-gray-500">深夜助眠</span>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500 mb-2">场景</p>
+                                <p class="text-morandi-dark font-medium">雨夜静谧，暖黄微光</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-2">益处</p>
+                                <p class="text-gray-700 leading-relaxed">促褪黑素分泌，红光助眠模式。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-morandi-dark text-morandi-cream py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- 品牌信息 -->
+            <div class="text-center mb-12">
+                <h3 class="text-2xl font-bold mb-3 text-morandi-cream">HarmoniWindow</h3>
+                <p class="text-sm text-morandi-cream/70 italic">声景幻窗</p>
+            </div>
+
+            <!-- 信息网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center md:text-left">
+                <!-- 支持信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">支持</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Incubated by XBOTPARK (Ningbo) &<br>
+                        Ningbo Institute of Intelligent Technology.
+                    </p>
+                </div>
+
+                <!-- 供应链信息 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">供应链</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed">
+                        Powered by Shared Factory &<br>
+                        Genesis Link Tech.
+                    </p>
+                </div>
+
+                <!-- 品牌使命 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-semibold text-morandi-cream/90 mb-3 uppercase tracking-wider">使命</h4>
+                    <p class="text-xs text-morandi-cream/60 leading-relaxed italic">
+                        用声景打造新的生活方式，<br>
+                        让感官的自由成为生活的常态
+                    </p>
+                </div>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="border-t border-morandi-cream/20 mb-8"></div>
+
+            <!-- 版权信息 -->
+            <div class="text-center">
+                <p class="text-xs text-morandi-cream/50">© 2025 HarmoniWindow Team.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        (function() {
+            const navbar = document.getElementById('navbar');
+            if (!navbar) return;
+
+            function handleScroll() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+
+            // 监听滚动事件
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        handleScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+
+            // 初始检查
+            handleScroll();
+        })();
+
+        // 用户旅程时间线滚动交互
+        (function() {
+            const journeySection = document.getElementById('user-journey');
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            
+            if (!journeySection || timelineItems.length === 0) return;
+
+            // 背景颜色映射
+            const bgClasses = {
+                'morning': 'morning-bg',
+                'focus': 'focus-bg',
+                'relax': 'relax-bg',
+                'sleep': 'sleep-bg'
+            };
+
+            // 检测当前可见的时间点
+            function updateBackground() {
+                const sectionTop = journeySection.offsetTop;
+                const sectionHeight = journeySection.offsetHeight;
+                const scrollPosition = window.scrollY + window.innerHeight / 2;
+                
+                // 检查是否在时间线区域内
+                if (scrollPosition < sectionTop || scrollPosition > sectionTop + sectionHeight) {
+                    return;
+                }
+
+                let activeItem = null;
+                let minDistance = Infinity;
+
+                timelineItems.forEach(item => {
+                    const itemTop = item.offsetTop + sectionTop;
+                    const itemCenter = itemTop + item.offsetHeight / 2;
+                    const distance = Math.abs(scrollPosition - itemCenter);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        activeItem = item;
+                    }
+                });
+
+                if (activeItem) {
+                    const bgType = activeItem.getAttribute('data-bg');
+                    
+                    // 移除所有背景类
+                    Object.values(bgClasses).forEach(cls => {
+                        journeySection.classList.remove(cls);
+                    });
+                    
+                    // 添加当前背景类
+                    if (bgClasses[bgType]) {
+                        journeySection.classList.add(bgClasses[bgType]);
+                    }
+
+                    // 更新活动状态
+                    timelineItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    activeItem.classList.add('active');
+                }
+            }
+
+            // 使用节流优化性能
+            let ticking = false;
+            function onScroll() {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        updateBackground();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', onScroll);
+            
+            // 初始调用
+            setTimeout(() => {
+                updateBackground();
+            }, 100);
+
+            // 监听窗口大小变化
+            window.addEventListener('resize', updateBackground);
+            
+            // 页面加载完成后初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateBackground);
+            } else {
+                updateBackground();
+            }
+        })();
+    </script>
+
+    <!-- 背景音频播放器 -->
+    <audio id="backgroundAudio" loop preload="auto">
+        <source src="https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg" type="audio/ogg">
+        <!-- 备用音频源 -->
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 音频控制按钮 -->
+    <button id="audioPlayerBtn" aria-label="切换背景音效" title="开启/关闭背景音效">
+        <!-- 静音状态图标 -->
+        <svg id="mutedIcon" class="absolute" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+        </svg>
+        <!-- 播放状态图标 -->
+        <svg id="playingIcon" class="absolute hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+    </button>
+
+    <script>
+        // 背景音频播放器控制
+        (function() {
+            const audio = document.getElementById('backgroundAudio');
+            const btn = document.getElementById('audioPlayerBtn');
+            const mutedIcon = document.getElementById('mutedIcon');
+            const playingIcon = document.getElementById('playingIcon');
+            
+            let isPlaying = false;
+            let fadeInterval = null;
+            
+            // 音量淡入函数
+            function fadeIn() {
+                audio.volume = 0;
+                audio.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                });
+                
+                clearInterval(fadeInterval);
+                let volume = 0;
+                fadeInterval = setInterval(() => {
+                    volume += 0.05;
+                    if (volume >= 1) {
+                        volume = 1;
+                        clearInterval(fadeInterval);
+                    }
+                    audio.volume = volume;
+                }, 100); // 每100ms增加0.05音量，总共2秒
+            }
+            
+            // 音量淡出函数
+            function fadeOut() {
+                clearInterval(fadeInterval);
+                let volume = audio.volume;
+                fadeInterval = setInterval(() => {
+                    volume -= 0.05;
+                    if (volume <= 0) {
+                        volume = 0;
+                        audio.pause();
+                        clearInterval(fadeInterval);
+                    }
+                    audio.volume = volume;
+                }, 100); // 每100ms减少0.05音量
+            }
+            
+            // 切换播放/暂停
+            btn.addEventListener('click', function() {
+                if (isPlaying) {
+                    // 暂停并淡出
+                    fadeOut();
+                    isPlaying = false;
+                    btn.classList.remove('playing');
+                    mutedIcon.classList.remove('hidden');
+                    playingIcon.classList.add('hidden');
+                } else {
+                    // 播放并淡入
+                    fadeIn();
+                    isPlaying = true;
+                    btn.classList.add('playing');
+                    mutedIcon.classList.add('hidden');
+                    playingIcon.classList.remove('hidden');
+                }
+            });
+            
+            // 初始化：确保音频是静音的
+            audio.volume = 0;
+            audio.muted = false; // 不使用muted属性，而是用volume控制，以便淡入淡出
+        })();
+    </script>
+
+</body>
+</html>
