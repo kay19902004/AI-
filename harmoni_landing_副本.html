@@ -218,6 +218,60 @@
         #audioPlayerBtn.playing svg {
             fill: #7A8B84;
         }
+        /* 滚动触发淡入动画 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 图标悬停动画 */
+        .icon-bounce:hover {
+            animation: iconBounce 0.6s ease;
+        }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        /* 渐变背景动画 */
+        .gradient-shift {
+            background: linear-gradient(45deg, #7A8B84, #5A6C7C, #D8C3A5);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        /* 卡片光泽效果 */
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        .card-shine:hover::before {
+            left: 100%;
+        }
+        /* 数字滚动动画 */
+        @keyframes numberRoll {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .number-roll {
+            animation: numberRoll 0.5s ease forwards;
+        }
     </style>
 </head>
 <body class="bg-morandi-cream text-morandi-dark font-sans antialiased">
@@ -259,7 +313,7 @@
                 <source src="https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4" type="video/mp4">
                 <!-- 备用图片，如果视频无法加载 -->
                 <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
-                     alt="Nature Window View" 
+                 alt="Nature Window View" 
                      class="w-full h-full object-cover">
             </video>
             <!-- 遮罩层，让文字更清晰 -->
@@ -298,54 +352,83 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- 卡片 1: 空间压抑 -->
-                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
-                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
-                        <!-- 封闭房间/盒子图标 - 无窗无门 -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="bg-gradient-to-br from-morandi-cream to-white p-8 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 card-shine scroll-reveal">
+                    <div class="w-14 h-14 bg-gradient-to-br from-morandi-slate/20 to-morandi-slate/10 rounded-full flex items-center justify-center mb-6 text-morandi-slate icon-bounce">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold mb-3 text-morandi-dark">空间压抑</h3>
                     <p class="text-gray-600 leading-relaxed">一二线城市的小户型租房，缺乏通透感，四面墙壁带来心理窒息。</p>
+                    <div class="mt-4 pt-4 border-t border-morandi-cream/50">
+                        <span class="text-xs text-morandi-slate font-medium">📊 影响 78% 的租房群体</span>
+                    </div>
                 </div>
 
                 <!-- 卡片 2: 感官匮乏 -->
-                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
-                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
-                        <!-- 带斜线的静态相框图标 -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="bg-gradient-to-br from-morandi-cream to-white p-8 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 card-shine scroll-reveal" style="animation-delay: 0.1s">
+                    <div class="w-14 h-14 bg-gradient-to-br from-morandi-slate/20 to-morandi-slate/10 rounded-full flex items-center justify-center mb-6 text-morandi-slate icon-bounce">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <rect x="4" y="4" width="16" height="12" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4l16 16" stroke-width="2.5"/>
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold mb-3 text-morandi-dark">感官匮乏</h3>
                     <p class="text-gray-600 leading-relaxed">现有装饰（壁画/摆件）功能单一，缺乏自然光照与声音的动态陪伴，容易审美疲劳。</p>
+                    <div class="mt-4 pt-4 border-t border-morandi-cream/50">
+                        <span class="text-xs text-morandi-slate font-medium">🎨 单一感官刺激</span>
+                    </div>
                 </div>
 
                 <!-- 卡片 3: 情绪孤独 -->
-                <div class="bg-morandi-cream p-8 rounded-2xl shadow-sm hover:shadow-md transition duration-300 transform hover:-translate-y-1">
-                    <div class="w-14 h-14 bg-morandi-slate/20 rounded-full flex items-center justify-center mb-6 text-morandi-slate">
-                        <!-- 孤独人物图标 - 单人 -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="bg-gradient-to-br from-morandi-cream to-white p-8 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 card-shine scroll-reveal" style="animation-delay: 0.2s">
+                    <div class="w-14 h-14 bg-gradient-to-br from-morandi-slate/20 to-morandi-slate/10 rounded-full flex items-center justify-center mb-6 text-morandi-slate icon-bounce">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="7" r="3" stroke-linecap="round" stroke-linejoin="round"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold mb-3 text-morandi-dark">情绪孤独</h3>
                     <p class="text-gray-600 leading-relaxed">下班后的 20-24 点，独自面对空荡的房间，缺乏治愈与陪伴。</p>
+                    <div class="mt-4 pt-4 border-t border-morandi-cream/50">
+                        <span class="text-xs text-morandi-slate font-medium">⏰ 夜间孤独高峰</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 3. 品牌使命展示 -->
-    <section class="py-16 px-4 bg-morandi-cream">
-        <div class="max-w-4xl mx-auto text-center">
-            <p class="text-2xl md:text-3xl font-light text-morandi-dark leading-relaxed italic">
+    <section class="py-16 px-4 bg-gradient-to-r from-morandi-cream via-white to-morandi-cream relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-40 h-40 bg-morandi-green rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-60 h-60 bg-morandi-sand rounded-full blur-3xl"></div>
+        </div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="mb-6">
+                <span class="text-4xl mb-4 inline-block animate-pulse">🌿</span>
+            </div>
+            <p class="text-2xl md:text-3xl font-light text-morandi-dark leading-relaxed italic mb-4">
                 "用声景打造新的生活方式，<br class="md:hidden">
                 让感官的自由成为生活的常态"
             </p>
-            <p class="mt-6 text-sm text-morandi-slate">—— HarmoniWindow 品牌使命</p>
+            <p class="mt-6 text-sm text-morandi-slate font-medium tracking-wider">—— HarmoniWindow 品牌使命</p>
+            <div class="mt-8 flex items-center justify-center gap-8 text-morandi-slate">
+                <div class="text-center scroll-reveal">
+                    <div class="text-2xl font-bold text-morandi-green number-roll">15"</div>
+                    <div class="text-xs">显示尺寸</div>
+                </div>
+                <div class="w-px h-8 bg-morandi-cream"></div>
+                <div class="text-center scroll-reveal" style="animation-delay: 0.1s">
+                    <div class="text-2xl font-bold text-morandi-green number-roll">4K</div>
+                    <div class="text-xs">超清画质</div>
+                </div>
+                <div class="w-px h-8 bg-morandi-cream"></div>
+                <div class="text-center scroll-reveal" style="animation-delay: 0.2s">
+                    <div class="text-2xl font-bold text-morandi-green number-roll">360°</div>
+                    <div class="text-xs">空间音频</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -433,7 +516,7 @@
                         <div class="mt-6 pt-6 border-t border-white/20">
                             <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-morandi-cream">独家功能</span>
                         </div>
-                    </div>
+                </div>
                 </a>
 
                 <!-- 卡片 5: 形 (Design) - 小卡片 -->
@@ -441,12 +524,12 @@
                     <div class="flex items-start gap-4 mb-4 group-hover:scale-105 transition-transform duration-300">
                         <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
                             🪵
-                        </div>
+                </div>
                         <div>
                             <h3 class="text-2xl font-bold mb-2">形</h3>
                             <p class="text-xl font-semibold text-morandi-cream mb-3">木质美学</p>
-                        </div>
-                    </div>
+                </div>
+                </div>
                     <p class="text-white/90 leading-relaxed">
                         磁性木质框架（木纹/金属），完美匹配家居装饰风格，融入生活空间。
                     </p>
@@ -487,10 +570,10 @@
                             <div>
                                 <p class="text-sm text-gray-500 mb-2">益处</p>
                                 <p class="text-gray-700 leading-relaxed">模拟自然光唤醒，调整生理节律。</p>
-                            </div>
-                        </div>
                     </div>
-
+                </div>
+            </div>
+            
                     <!-- 15:00 - 专注工作 -->
                     <div class="timeline-item relative flex flex-col md:flex-row items-start gap-6" data-time="15:00" data-bg="focus">
                         <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-morandi-green/20 rounded-full flex items-center justify-center shadow-lg z-10 border-4 border-white relative md:left-0 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0">
@@ -816,6 +899,27 @@
             // 初始化：确保音频是静音的
             audio.volume = 0;
             audio.muted = false; // 不使用muted属性，而是用volume控制，以便淡入淡出
+        })();
+
+        // 滚动触发动画
+        (function() {
+            const revealElements = document.querySelectorAll('.scroll-reveal');
+            
+            function checkScroll() {
+                revealElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementBottom = element.getBoundingClientRect().bottom;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementTop < windowHeight * 0.85 && elementBottom > 0) {
+                        element.classList.add('active');
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', checkScroll);
+            window.addEventListener('load', checkScroll);
+            checkScroll(); // 初始检查
         })();
     </script>
 
