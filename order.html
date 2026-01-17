@@ -84,6 +84,50 @@
                 transform: scale(1);
             }
         }
+
+        /* 自定义滑块及数值气泡 */
+        #priceExpectation::-webkit-slider-runnable-track {
+            height: 10px;
+            background: #f3f4f6;
+            border-radius: 5px;
+        }
+        #priceExpectation::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #7C9082; /* morandi-green */
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 3px solid white;
+            transition: transform 0.2s;
+        }
+        #priceExpectation:active::-webkit-slider-thumb {
+            transform: scale(1.1);
+        }
+
+        .bubble-arrow {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #7C9082;
+        }
+
+        /* 数字跳动动画 */
+        .number-update {
+            animation: jump 0.3s ease-out;
+        }
+        @keyframes jump {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #7C9082; }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body class="bg-morandi-cream text-morandi-dark font-sans antialiased">
@@ -133,8 +177,51 @@
         <!-- 右侧：预订表单 -->
         <div class="w-full md:w-1/2 bg-white flex items-center justify-center p-8 md:p-16">
             <div class="w-full max-w-md fade-in-up">
-                <h2 class="text-2xl md:text-3xl font-bold text-morandi-dark mb-2">加入等待名单</h2>
-                <p class="text-morandi-slate mb-8">我们将在产品发售时第一时间通知您</p>
+                <!-- 高端 Offer 容器 -->
+                <div class="mb-10 overflow-hidden bg-white border border-morandi-green/30 rounded-3xl shadow-xl">
+                    <!-- 顶部标签栏 -->
+                    <div class="bg-morandi-dark py-2.5 px-4 text-center">
+                        <span class="text-white text-[10px] font-bold tracking-[0.3em] uppercase">Limited Time Offer · 限时首发</span>
+                    </div>
+                    
+                    <div class="p-8">
+                        <!-- 价格展示区 -->
+                        <div class="flex flex-col items-center md:items-start mb-8">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-gray-400 text-sm line-through decoration-gray-300">官方零售价 ¥2599</span>
+                                <span class="text-[10px] font-bold text-white bg-morandi-green px-2 py-0.5 rounded-full">立省 ¥599</span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="text-2xl font-bold text-morandi-dark mr-1">¥</span>
+                                <span class="text-5xl font-black text-morandi-dark tracking-tight">2000</span>
+                                <span class="ml-3 text-xs text-morandi-slate font-medium bg-morandi-cream/50 px-2 py-1 rounded">种子用户首发价</span>
+                            </div>
+                        </div>
+
+                        <!-- 权益卡片 (暖沙色渐变) -->
+                        <div class="p-6 bg-gradient-to-r from-morandi-cream to-white rounded-2xl border border-morandi-cream/50 shadow-sm relative overflow-hidden group">
+                            <!-- 装饰性光晕 -->
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-morandi-sand/20 rounded-full blur-2xl"></div>
+                            
+                            <div class="flex items-start gap-4 relative z-10">
+                                <div class="flex-shrink-0 w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                    💎
+                                </div>
+                                <div class="space-y-1">
+                                    <h3 class="font-bold text-morandi-dark text-base">种子用户尊享权益</h3>
+                                    <p class="text-sm text-morandi-slate leading-relaxed">
+                                        支付 <span class="font-bold text-morandi-dark">50</span> 元定金，<br>
+                                        <span class="text-morandi-dark">最高可抵扣</span> <span class="text-2xl font-black text-morandi-green">¥1200</span>
+                                        <span class="text-[10px] opacity-60 font-normal block mt-1">※ 抵扣额度高达产品价格的 60%</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold text-morandi-dark mb-2 text-center md:text-left">加入等待名单</h2>
+                <p class="text-morandi-slate mb-8 text-center md:text-left">我们将在产品发售时第一时间通知您</p>
 
                 <form id="orderForm" class="space-y-6">
                     <!-- 姓名 -->
@@ -170,16 +257,87 @@
                         <label for="frame" class="block text-sm font-medium text-morandi-dark mb-2">
                             框架选择 <span class="text-red-500">*</span>
                         </label>
-                        <select 
-                            id="frame" 
-                            name="frame" 
-                            required
-                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all appearance-none cursor-pointer">
-                            <option value="">请选择框架材质</option>
-                            <option value="walnut">胡桃木 (Walnut)</option>
-                            <option value="oak">橡木 (Oak)</option>
-                            <option value="metal-black">金属黑 (Metal Black)</option>
-                        </select>
+                        <div class="relative">
+                            <select 
+                                id="frame" 
+                                name="frame" 
+                                required
+                                class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all appearance-none cursor-pointer">
+                                <option value="">请选择框架材质</option>
+                                <option value="walnut">胡桃木 (Walnut)</option>
+                                <option value="oak">橡木 (Oak)</option>
+                                <option value="metal-black">金属黑 (Metal Black)</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-morandi-slate">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 心理预期价格滑块 -->
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-morandi-dark mb-1">
+                                    您的心理预期价格 (Value Expectation)
+                                </label>
+                                <p class="text-[10px] text-morandi-slate">您的认可越值钱，抵扣力度越大！</p>
+                            </div>
+                        </div>
+
+                        <div class="relative pt-10 pb-2">
+                            <!-- 数值气泡 (Bubble) -->
+                            <div id="bubbleContainer" class="absolute top-0 left-0 -translate-x-1/2 transition-all duration-75 pointer-events-none">
+                                <div class="bg-morandi-green text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg relative">
+                                    <span id="priceValue">¥2000</span>
+                                    <div class="bubble-arrow"></div>
+                                </div>
+                            </div>
+
+                            <input 
+                                type="range" 
+                                id="priceExpectation" 
+                                name="priceExpectation" 
+                                min="1000" 
+                                max="5000" 
+                                step="100" 
+                                value="2000"
+                                class="w-full h-2.5 bg-morandi-cream rounded-full appearance-none cursor-pointer accent-morandi-green">
+                            
+                            <div class="flex justify-between items-center px-1 mt-2">
+                                <span class="text-[10px] text-morandi-slate font-medium">¥1000</span>
+                                <span class="text-[10px] text-morandi-slate font-medium">¥5000</span>
+                            </div>
+                        </div>
+
+                        <!-- 计算结果实时显示 (小票样式) -->
+                        <div class="mt-8 bg-white border-2 border-dashed border-morandi-sand/50 rounded-2xl p-6 relative overflow-hidden">
+                            <!-- 装饰用的小票圆孔效果 -->
+                            <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-morandi-cream rounded-full border-r border-morandi-sand/30"></div>
+                            <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-morandi-cream rounded-full border-l border-morandi-sand/30"></div>
+
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-morandi-slate font-medium">定金膨胀倍数 (Multi.)</span>
+                                    <span id="multiplierDisplay" class="font-bold text-morandi-dark transition-all duration-200">10.0x</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-morandi-slate font-medium">认可立省金额 (Savings)</span>
+                                    <span id="discountDisplay" class="font-bold text-morandi-green transition-all duration-200">¥500</span>
+                                </div>
+                                
+                                <div class="border-t border-dashed border-morandi-sand/30 my-2"></div>
+                                
+                                <div class="flex justify-between items-end">
+                                    <span class="text-sm font-bold text-morandi-dark">最终到手估价</span>
+                                    <div class="flex items-center text-morandi-green">
+                                        <span class="text-lg mr-1">✓</span>
+                                        <span id="finalPriceDisplay" class="text-3xl font-black transition-all duration-200">¥1500</span>
+                                    </div>
+                                </div>
+                                <p class="text-[9px] text-center text-morandi-slate italic mt-2">* 实际价格根据发售时汇率及配置略有浮动</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 消息（可选） -->
@@ -190,21 +348,83 @@
                         <textarea 
                             id="message" 
                             name="message" 
-                            rows="4"
-                            class="w-full px-4 py-3 rounded-lg border border-morandi-cream/50 bg-morandi-cream/30 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all resize-none"
+                            rows="3"
+                            class="w-full px-4 py-3 rounded-xl border border-morandi-cream/50 bg-morandi-cream/20 focus:outline-none focus:ring-2 focus:ring-morandi-green focus:border-transparent transition-all resize-none shadow-sm"
                             placeholder="有什么想对我们说的吗？"></textarea>
                     </div>
 
-                    <!-- 提交按钮 -->
-                    <button 
-                        type="submit"
-                        class="w-full bg-morandi-sand hover:bg-morandi-green text-morandi-dark font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105">
-                        加入等待名单
-                    </button>
+                    <!-- 提交按钮区域 -->
+                    <div class="pt-4">
+                        <button 
+                            type="submit"
+                            class="w-full bg-morandi-dark hover:bg-morandi-green text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-[1.02]">
+                            立即支付 ¥50 定金 · 锁定权益
+                        </button>
+                        <p class="text-xs text-gray-400 mt-3 text-center">
+                            支付安全由第三方加密支持，不满意可随时退款
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
     </main>
+
+    <!-- 扫码支付模态框 -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content max-w-[450px] rounded-2xl p-8 relative">
+            <!-- 关闭按钮 -->
+            <button onclick="closeModal()" class="absolute right-4 top-4 text-morandi-slate hover:text-morandi-dark transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-morandi-dark mb-2">扫码支付定金</h3>
+                <div class="flex items-baseline justify-center text-morandi-green">
+                    <span class="text-lg font-bold mr-1">¥</span>
+                    <span class="text-4xl font-black">50.00</span>
+                </div>
+            </div>
+            
+            <!-- 二维码区域 -->
+            <div class="w-64 h-64 bg-white border-2 border-morandi-dark rounded-xl flex items-center justify-center mx-auto mb-6 relative overflow-hidden group shadow-sm">
+                <div class="text-center">
+                    <!-- 模拟二维码占位图标 -->
+                    <div class="mb-3 text-morandi-dark/20 group-hover:scale-110 transition-transform duration-500">
+                        <svg class="w-24 h-24 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm0 4h2v2h-2v-2zm-2 2h2v2h-2v-2zm-4 0h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-xs text-morandi-slate font-medium">请使用微信/支付宝扫码</p>
+                </div>
+                <!-- 装饰性边角 -->
+                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-morandi-green"></div>
+                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-morandi-green"></div>
+                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-morandi-green"></div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-morandi-green"></div>
+            </div>
+            
+            <!-- 支付提示 -->
+            <div class="text-center space-y-4">
+                <div class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-bold tracking-wider animate-pulse">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2"></span>
+                    请在 15:00 内完成支付
+                </div>
+                
+                <button 
+                    onclick="handlePaymentComplete()"
+                    class="w-full bg-morandi-green hover:bg-morandi-dark text-white font-bold py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    我已完成支付
+                </button>
+                
+                <p class="text-[10px] text-morandi-slate/50">
+                    支付即代表您同意《种子用户服务协议》<br>
+                    如有疑问请联系客服
+                </p>
+            </div>
+        </div>
+    </div>
 
     <!-- 成功提示模态框 -->
     <div id="successModal" class="modal">
@@ -276,39 +496,125 @@
     </footer>
 
     <script>
+        // 常量定义
+        const PRODUCT_PRICE = 2000;
+        const DEPOSIT = 50;
+        const MAX_DISCOUNT = PRODUCT_PRICE * 0.6; // 1200 元
+
+        // 获取 DOM 元素
+        const slider = document.getElementById('priceExpectation');
+        const priceValue = document.getElementById('priceValue');
+        const bubbleContainer = document.getElementById('bubbleContainer');
+        const multiplierDisplay = document.getElementById('multiplierDisplay');
+        const discountDisplay = document.getElementById('discountDisplay');
+        const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+
+        // 核心定价逻辑函数
+        function updatePricing() {
+            const expectedPrice = parseInt(slider.value);
+            
+            // 1. 倍数计算公式：基础 5 倍，每高出 1000 元额外增加 5 倍
+            let multiplier = 5 + ((expectedPrice - 1000) / 200);
+            
+            // 2. 抵扣金额计算
+            let calculatedDiscount = DEPOSIT * multiplier;
+            
+            // 3. 执行封顶检查 (最高 1200)
+            let finalDiscount = Math.min(calculatedDiscount, MAX_DISCOUNT);
+            
+            // 4. 实时界面更新
+            priceValue.textContent = `¥${expectedPrice}`;
+            multiplierDisplay.textContent = `${multiplier.toFixed(1)}x`;
+            discountDisplay.textContent = `¥${Math.round(finalDiscount)}`;
+            finalPriceDisplay.textContent = `¥${Math.round(PRODUCT_PRICE - finalDiscount)}`;
+
+            // 5. 更新气泡位置
+            const percent = (expectedPrice - slider.min) / (slider.max - slider.min);
+            if (bubbleContainer) {
+                bubbleContainer.style.left = `${percent * 100}%`;
+            }
+
+            // 6. 添加跳动动画反馈
+            [multiplierDisplay, discountDisplay, finalPriceDisplay].forEach(el => {
+                el.classList.remove('number-update');
+                void el.offsetWidth; // 触发重绘
+                el.classList.add('number-update');
+            });
+
+            return { expectedPrice, finalDiscount };
+        }
+
+        // 绑定滑块事件
+        if (slider) {
+            slider.addEventListener('input', updatePricing);
+            // 初始化执行一次
+            updatePricing();
+        }
+
+        // 存储当前待提交的数据
+        let pendingPayload = null;
+
         // 表单提交处理
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // 获取表单数据
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                frame: document.getElementById('frame').value,
-                message: document.getElementById('message').value
+            const { expectedPrice, finalDiscount } = updatePricing();
+            
+            // 构建提交数据对象 (Payload)
+            pendingPayload = {
+                "name": document.getElementById('name').value,
+                "email": document.getElementById('email').value,
+                "frame_choice": document.getElementById('frame').value,
+                "product_base_price": PRODUCT_PRICE,
+                "user_expected_value": expectedPrice,
+                "deposit_paid": DEPOSIT,
+                "discount_applied": Math.round(finalDiscount),
+                "final_payment_due": Math.round(PRODUCT_PRICE - finalDiscount),
+                "is_seed_user": true,
+                "message": document.getElementById('message').value,
+                "timestamp": new Date().toISOString()
             };
             
-            // 这里可以添加实际的表单提交逻辑（例如发送到服务器）
-            console.log('Form submitted:', formData);
+            // 第一步：显示支付模态框
+            document.getElementById('paymentModal').classList.add('active');
+        });
+
+        // 支付完成后的逻辑
+        function handlePaymentComplete() {
+            // 1. 隐藏支付模态框
+            document.getElementById('paymentModal').classList.remove('active');
             
-            // 显示成功模态框
+            // 2. 显示成功模态框
             document.getElementById('successModal').classList.add('active');
             
-            // 重置表单
-            this.reset();
-        });
+            // 3. 模拟发送数据到后端
+            console.log('支付完成，正在发送预订数据 (Payload):', pendingPayload);
+            
+            // 这里可以添加真实的 fetch 请求
+            // fetch('/api/orders', { method: 'POST', body: JSON.stringify(pendingPayload) })
+            
+            // 4. 重置表单并恢复初始定价显示
+            document.getElementById('orderForm').reset();
+            updatePricing();
+            pendingPayload = null;
+        }
 
         // 关闭模态框
         function closeModal() {
             document.getElementById('successModal').classList.remove('active');
+            document.getElementById('paymentModal').classList.remove('active');
         }
 
         // 点击模态框外部关闭
-        document.getElementById('successModal').addEventListener('click', function(e) {
-            if (e.target === this) {
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
                 closeModal();
             }
         });
+
+        // 将 handlePaymentComplete 暴露给全局以供 onclick 调用
+        window.handlePaymentComplete = handlePaymentComplete;
+        window.closeModal = closeModal;
 
         // ESC 键关闭模态框
         document.addEventListener('keydown', function(e) {
